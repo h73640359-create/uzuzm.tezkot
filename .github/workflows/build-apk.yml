@@ -69,6 +69,23 @@ jobs:
           }
           echo "## ✅ flutter test — barcha testlar o'tdi" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Report failure (commit comment)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "### ❌ ${{ github.job }} failed (run ${{ github.run_id }})"
+            for f in analyze.log test.log build-debug.log build-release.log; do
+              if [ -f "$f" ]; then
+                echo; echo "<details><summary>$f</summary>"; echo; echo '```'
+                grep -vE "^\s*$" "$f" | grep -iE "error|warning •|FAILED|Exception|What went wrong|expected|Actual|\.dart:[0-9]+" | head -120
+                echo '```'; echo "</details>"
+              fi
+            done
+          } > report.md
+          gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" -f body="$(cat report.md)" >/dev/null || true
+
   build:
     name: Build APK
     needs: analyze-test
@@ -143,6 +160,23 @@ jobs:
             echo '```' >> "$GITHUB_STEP_SUMMARY"
             exit 1
           }
+
+      - name: Report failure (commit comment)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "### ❌ ${{ github.job }} failed (run ${{ github.run_id }})"
+            for f in analyze.log test.log build-debug.log build-release.log; do
+              if [ -f "$f" ]; then
+                echo; echo "<details><summary>$f</summary>"; echo; echo '```'
+                grep -vE "^\s*$" "$f" | grep -iE "error|warning •|FAILED|Exception|What went wrong|expected|Actual|\.dart:[0-9]+" | head -120
+                echo '```'; echo "</details>"
+              fi
+            done
+          } > report.md
+          gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" -f body="$(cat report.md)" >/dev/null || true
 
       - name: Rename artifacts
         run: |
