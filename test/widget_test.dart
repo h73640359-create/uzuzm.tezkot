@@ -20,11 +20,15 @@ void main() {
       ),
     );
     await tester.pump(const Duration(milliseconds: 600));
+    await tester.pump(const Duration(milliseconds: 800));
 
     expect(find.text('Bosh sahifa'), findsOneWidget);
     expect(find.text('Kategoriyalar'), findsWidgets);
     expect(find.text('Savat'), findsOneWidget);
     expect(find.text('Buyurtmalar'), findsOneWidget);
     expect(find.text('Profil'), findsOneWidget);
+
+    // Banner avtoplay timerini to'xtatish uchun daraxtni tozalaymiz
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 }

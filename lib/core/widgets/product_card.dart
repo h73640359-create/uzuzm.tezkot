@@ -361,19 +361,11 @@ class _FadeIn extends StatefulWidget {
 }
 
 class _FadeInState extends State<_FadeIn> with SingleTickerProviderStateMixin {
+  late final int _delayMs = (widget.index.clamp(0, 8)) * 40;
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 320),
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    final delay = (widget.index.clamp(0, 8)) * 40;
-    Future<void>.delayed(Duration(milliseconds: delay), () {
-      if (mounted) _c.forward();
-    });
-  }
+    duration: Duration(milliseconds: 320 + _delayMs),
+  )..forward();
 
   @override
   void dispose() {
@@ -383,7 +375,9 @@ class _FadeInState extends State<_FadeIn> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final a = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+    // Kechikish: animatsiyaning boshlang'ich qismi "kutish" sifatida ishlatiladi
+    final start = _delayMs / (320 + _delayMs);
+    final a = CurvedAnimation(parent: _c, curve: Interval(start, 1, curve: Curves.easeOutCubic));
     return FadeTransition(
       opacity: a,
       child: SlideTransition(
