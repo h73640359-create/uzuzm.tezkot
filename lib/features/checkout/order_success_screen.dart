@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_button.dart';
+import '../../data/models/order.dart';
 import '../../navigation/app_routes.dart';
 import '../../providers/orders_provider.dart';
 

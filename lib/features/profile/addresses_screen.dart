@@ -194,7 +194,7 @@ class _AddressEditorState extends State<_AddressEditor> {
             ),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
-              value: _cities.contains(_city.text) ? _city.text : _cities.first,
+              initialValue: _cities.contains(_city.text) ? _city.text : _cities.first,
               decoration: const InputDecoration(),
               items: [for (final c in _cities) DropdownMenuItem(value: c, child: Text(c))],
               onChanged: (v) => _city.text = v ?? 'Toshkent',

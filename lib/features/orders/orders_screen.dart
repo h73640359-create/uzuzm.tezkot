@@ -26,7 +26,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(ordersProvider);
-    final c = context.colors;
     return Scaffold(
       appBar: AppBar(title: const Text('Buyurtmalar')),
       body: Column(

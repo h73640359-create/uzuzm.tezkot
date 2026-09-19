@@ -35,12 +35,14 @@ class SettingsScreen extends ConsumerWidget {
                   (ThemeMode.dark, 'Tungi rejim', Icons.dark_mode_outlined),
                   (ThemeMode.system, 'Tizim bo\'yicha', Icons.settings_suggest_outlined),
                 ])
-                  RadioListTile<ThemeMode>(
-                    value: mode,
-                    groupValue: s.themeMode,
-                    onChanged: (v) => n.setThemeMode(v!),
+                  ListTile(
+                    leading: Icon(icon),
                     title: Text(label),
-                    secondary: Icon(icon),
+                    trailing: Icon(
+                      s.themeMode == mode ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
+                      color: s.themeMode == mode ? AppColors.primary : c.textTertiary,
+                    ),
+                    onTap: () => n.setThemeMode(mode),
                   ),
               ],
             ),

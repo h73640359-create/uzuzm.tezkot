@@ -6,6 +6,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/state_views.dart';
+import '../../data/models/order.dart';
 import '../../providers/orders_provider.dart';
 
 class NotificationsScreen extends ConsumerWidget {

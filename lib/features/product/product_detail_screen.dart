@@ -8,7 +8,6 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_button.dart';
-import '../../core/widgets/app_image.dart';
 import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/price_text.dart';
 import '../../core/widgets/product_card.dart';
