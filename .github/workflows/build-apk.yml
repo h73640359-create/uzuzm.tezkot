@@ -46,10 +46,28 @@ jobs:
         run: flutter pub get
 
       - name: Analyze
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+        run: |
+          set -o pipefail
+          flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1 | tee analyze.log || {
+            echo "## ❌ flutter analyze" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -E "error •|warning •" analyze.log | head -80 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          }
+          echo "## ✅ flutter analyze — xatolik yo'q" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Tests
-        run: flutter test --reporter expanded
+        run: |
+          set -o pipefail
+          flutter test --reporter expanded 2>&1 | tee test.log || {
+            echo "## ❌ flutter test" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -vE "^\s*$" test.log | grep -E "FAILED|Error|Exception|expected|Actual|at |\.dart" | head -80 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          }
+          echo "## ✅ flutter test — barcha testlar o'tdi" >> "$GITHUB_STEP_SUMMARY"
 
   build:
     name: Build APK
@@ -104,13 +122,27 @@ jobs:
 
       - name: Build debug APK
         if: ${{ github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == 'both' || github.event.inputs.build_type == '' }}
-        run: flutter build apk --debug
+        run: |
+          set -o pipefail
+          flutter build apk --debug 2>&1 | tee build-debug.log || {
+            echo "## ❌ Debug APK build" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -iE "error|FAILURE|What went wrong|Exception" -A3 build-debug.log | head -100 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          }
 
       - name: Build release APK
         if: ${{ github.event.inputs.build_type == 'release' || github.event.inputs.build_type == 'both' || github.event.inputs.build_type == '' }}
         run: |
-          flutter build apk --release
-          flutter build apk --release --split-per-abi
+          set -o pipefail
+          { flutter build apk --release && flutter build apk --release --split-per-abi; } 2>&1 | tee build-release.log || {
+            echo "## ❌ Release APK build" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -iE "error|FAILURE|What went wrong|Exception" -A3 build-release.log | head -100 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          }
 
       - name: Rename artifacts
         run: |
@@ -125,6 +157,12 @@ jobs:
             cp "$f" "dist/BozorGo-v$VERSION-release-$abi.apk"
           done
           ls -lh dist
+          {
+            echo "## 📦 APK fayllar"
+            echo '```'
+            ls -lh dist
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload debug APK
         if: ${{ hashFiles('dist/*-debug.apk') != '' }}
